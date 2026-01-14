@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -38,7 +39,7 @@ public class PlayerScript : MonoBehaviour
         characterAnimator.SetFloat("MovementSpeed", absoluteHorizontalMovement);
 
         rb.linearVelocityX = horizontalMovement * speed;
-        characterAnimator.SetFloat("VelocityY", rb.linearVelocityY);
+        //characterAnimator.SetFloat("VelocityY", rb.linearVelocityY);
 
         if (Input.GetAxis("Jump") > 0 && isGroundedScript)
         {
@@ -61,7 +62,7 @@ public class PlayerScript : MonoBehaviour
             
         }
         //Cambiar dirección del sprite según al lado que vaya
-
+        /*
         if (horizontalMovement > 0 && !faceRight)
         {
             Turn();
@@ -70,12 +71,22 @@ public class PlayerScript : MonoBehaviour
         {
             Turn();
         }
-
+        */
 
     }
     void Turn()
     {
         transform.localScale = new Vector2(transform.localScale.x * -1, transform.localScale.y);
         faceRight = !faceRight;
+    }
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        // Verificar si el objeto con el que colisionamos tiene el tag "Muerte"
+        if (col.gameObject.CompareTag("Muerte"))
+        {
+            // Reiniciar la escena actual
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
 }
