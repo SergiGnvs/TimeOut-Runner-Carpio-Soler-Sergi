@@ -125,7 +125,7 @@ public class PlayerScript : MonoBehaviour
             }
 
             // Reiniciar escena después de 1 segundo
-            Invoke(nameof(ReiniciarEscena), 1f);
+            Invoke(nameof(ReiniciarEscena), 3f);
         }
     }
     void ReiniciarEscena()
