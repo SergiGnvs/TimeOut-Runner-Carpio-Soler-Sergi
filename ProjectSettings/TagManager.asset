@@ -7,6 +7,7 @@ TagManager:
   - Muerte
   - Jugador
   - Checkpoint
+  - Victoria
   layers:
   - Default
   - TransparentFX

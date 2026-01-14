@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class PlayerScript : MonoBehaviour
     public bool isMoving;
 
     public ContadorScript contador;
+    public TMP_Text mensajeVictoria;
 
     PlayerInput input;
     private Rigidbody2D rb;
@@ -22,7 +24,8 @@ public class PlayerScript : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         characterAnimator = GetComponent<Animator>();
 
-        
+        mensajeVictoria.gameObject.SetActive(false);
+
         Physics2D.queriesStartInColliders = false;
     }
 
@@ -112,5 +115,21 @@ public class PlayerScript : MonoBehaviour
             // Destruye checkpoint
             Destroy(col.gameObject);
         }
+
+        if (col.gameObject.CompareTag("Victoria"))
+        {
+            if (mensajeVictoria != null)
+            {
+                mensajeVictoria.gameObject.SetActive(true);
+                mensajeVictoria.text = "¡Has ganado!";
+            }
+
+            // Reiniciar escena después de 1 segundo
+            Invoke(nameof(ReiniciarEscena), 1f);
+        }
+    }
+    void ReiniciarEscena()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
