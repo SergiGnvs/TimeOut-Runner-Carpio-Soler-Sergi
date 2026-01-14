@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -7,8 +8,11 @@ public class PlayerScript : MonoBehaviour
     public float jumpForce = 6f;
     private bool faceRight = true;
     public bool isGroundedScript = true;
-    
+    public bool isMoving;
 
+    public ContadorScript contador;
+
+    PlayerInput input;
     private Rigidbody2D rb;
     private Animator characterAnimator;
     
@@ -18,7 +22,7 @@ public class PlayerScript : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         characterAnimator = GetComponent<Animator>();
 
-        //Evitar que colisione consigo mismo :D
+        
         Physics2D.queriesStartInColliders = false;
     }
 
@@ -27,7 +31,7 @@ public class PlayerScript : MonoBehaviour
     {
         
     }
-    //Movimiento basado en física, siempre en FixedUpdate
+    //Movimiento basado en fï¿½sica, siempre en FixedUpdate
     private void FixedUpdate()
     {
 
@@ -36,15 +40,14 @@ public class PlayerScript : MonoBehaviour
 
         float absoluteHorizontalMovement = Mathf.Abs(horizontalMovement);
 
-        characterAnimator.SetFloat("MovementSpeed", absoluteHorizontalMovement);
 
         rb.linearVelocityX = horizontalMovement * speed;
         //characterAnimator.SetFloat("VelocityY", rb.linearVelocityY);
 
+        //Salto
         if (Input.GetAxis("Jump") > 0 && isGroundedScript)
         {
             rb.linearVelocityY = 0f;
-            Debug.Log("Jumping");
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             isGroundedScript = false;
             
@@ -53,16 +56,15 @@ public class PlayerScript : MonoBehaviour
             
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down);
 
-        if (!isGroundedScript && rb.linearVelocityY < 0.0f &&  hit.collider != null &&  hit.distance < 0.6f)
+        if (!isGroundedScript && rb.linearVelocityY < 0.0f &&  hit.collider != null &&  hit.distance < 1f)
         {
 
-            Debug.Log($"He colisionado {hit.collider.gameObject.name} a distancia " +  hit.distance);
             isGroundedScript = true;
             characterAnimator.SetBool("isGrounded", isGroundedScript);
             
         }
-        //Cambiar dirección del sprite según al lado que vaya
-        /*
+        //Cambiar direcciï¿½n del sprite segï¿½n al lado que vaya
+        
         if (horizontalMovement > 0 && !faceRight)
         {
             Turn();
@@ -71,7 +73,16 @@ public class PlayerScript : MonoBehaviour
         {
             Turn();
         }
-        */
+
+        if (Mathf.Abs(horizontalMovement) > 0.1f)
+        {
+            characterAnimator.SetBool("isMoving", true);
+        }
+        else
+        {
+            characterAnimator.SetBool("isMoving", false);
+        }
+
 
     }
     void Turn()
@@ -85,8 +96,21 @@ public class PlayerScript : MonoBehaviour
         // Verificar si el objeto con el que colisionamos tiene el tag "Muerte"
         if (col.gameObject.CompareTag("Muerte"))
         {
-            // Reiniciar la escena actual
+            // Reinicia la escena actual
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        if (col.gameObject.CompareTag("Checkpoint"))
+        {
+            // Suma tiempo al contador
+            if (contador != null)
+            {
+                int tiempoSumado = 5;
+                contador.SumarTiempo(tiempoSumado);
+            }
+
+            // Destruye checkpoint
+            Destroy(col.gameObject);
         }
     }
 }
